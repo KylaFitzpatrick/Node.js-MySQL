@@ -87,14 +87,15 @@ function addNewProduct(){
     .then(function(answer) {
         console.log(`product: ${answer.product}, department: ${answer.department}, 
             price: ${answer.price}, stock_quantity: ${answer.units}`)
-        var statement = "INSERT INTO products (product_name, department_name, stock_quantity) VALUES ?";
-        var product = [
-            {product_name: answer.product}, 
-            {department_name: answer.department}, 
-            {price: answer.price}, 
-            {stock_quantity: answer.units}
-        ]
-        
+            var product = [
+                {product_name: answer.product}, 
+                {department_name: answer.department}, 
+                {price: answer.price}, 
+                {stock_quantity: answer.units}
+            ]
+            
+            var statement = 
+            "INSERT INTO products (product_name, department_name, stock_quantity) VALUES ? ";
                 connection.query(statement, [product], (err, results, fields) => {
                     if (err) {
                       return console.error(err.message);
@@ -102,7 +103,7 @@ function addNewProduct(){
                     // get inserted rows
                     console.log('Row inserted:' + results.affectedRows);
                   });
-                
+                  connection.end();
                 runSearch();
                 
             }
