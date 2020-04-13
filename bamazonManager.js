@@ -1,6 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-
+require("console.table")
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -88,26 +88,33 @@ function addNewProduct(){
         console.log(`product: ${answer.product}, department: ${answer.department}, 
             price: ${answer.price}, stock_quantity: ${answer.units}`)
             var product = [
-                {product_name: answer.product}, 
-                {department_name: answer.department}, 
-                {price: answer.price}, 
-                {stock_quantity: answer.units}
+                answer.product, 
+                answer.department, 
+                answer.price, 
+                answer.units
             ]
             
             var statement = 
-            "INSERT INTO products (product_name, department_name, stock_quantity) VALUES ? ";
-                connection.query(statement, [product], (err, results, fields) => {
+            "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?) ";
+               var sqlstmt= connection.query(statement, ["products","product_name", "department_name", "price", "stock_quantity",answer.product, 
+                answer.department, 
+                answer.price, 
+                answer.units], (err, results) => {
                     if (err) {
                       return console.error(err.message);
                     }
                     // get inserted rows
                     console.log('Row inserted:' + results.affectedRows);
                   });
+
+
+                  console.log(sqlstmt.sql)
                   connection.end();
                 runSearch();
                 
             }
         );
+        
     };
 
 // If a manager selects Add to Inventory, your app should display a prompt that will let the manager "add more" of any item currently in the store.
@@ -161,14 +168,13 @@ function addInventory(){
   // If a manager selects View Low Inventory, then it should list all items with an inventory count lower than five.
 
   function lowInventory() {
-    var query = "SELECT * FROM products";
+    var query = "SELECT * FROM products WHERE stock_quantity < 5";
+
     connection.query(query, function (err, res) {
         if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            if(res[i].stock_quantity < 5){
-            console.log("Id: " + res[i].item_id + " || Product: " + res[i].product_name + " || Department: " + res[i].department_name + " || Price: " + res[i].price + "|| Quantity: " + res[i].stock_quantity);
-            }
-        }
+      
+            console.table(res);
+          
         runSearch();
     })
 }
@@ -179,9 +185,7 @@ function productsForSale() {
     var query = "SELECT * FROM products";
     connection.query(query, function (err, res) {
         if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            console.log("Id: " + res[i].item_id + " || Product: " + res[i].product_name + " || Department: " + res[i].department_name + " || Price: " + res[i].price + "|| Quantity: " + res[i].stock_quantity);
-        }
+        console.table(res)
         runSearch();
     })
 }
