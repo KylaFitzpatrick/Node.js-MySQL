@@ -87,13 +87,6 @@ function addNewProduct(){
     .then(function(answer) {
         console.log(`product: ${answer.product}, department: ${answer.department}, 
             price: ${answer.price}, stock_quantity: ${answer.units}`)
-            var product = [
-                answer.product, 
-                answer.department, 
-                answer.price, 
-                answer.units
-            ]
-            
             var statement = 
             "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?) ";
                var sqlstmt= connection.query(statement, ["products","product_name", "department_name", "price", "stock_quantity",answer.product, 
