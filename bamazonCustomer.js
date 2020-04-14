@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
     user: "root",
 
     // Your password
-    password: "Lucy!123",
+    password: "",
     database: "bamazon"
 });
 
@@ -91,7 +91,6 @@ function idSearch() {
                        
                         connection.query(`UPDATE products SET stock_quantity=${quantityLeft}, product_sale= product_sale + ${productSale} WHERE item_id=${answer.id}`, function(err, results) {
                             if (err) throw err;
-                            console.log(`Product sale is: ${productSale}`);
              
                     });
                 }
