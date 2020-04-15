@@ -1,19 +1,9 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 require("console.table")
-var connection = mysql.createConnection({
-    host: "localhost",
+var config = require('./config');
+var connection = mysql.createConnection(config.databaseOptions);
 
-    // Your port; if not 3306
-    port: 3306,
-
-    // Your username
-    user: "root",
-
-    // Your password
-    password: "",
-    database: "bamazon"
-});
 
 connection.connect(function (err) {
     if (err) throw err;
@@ -82,14 +72,14 @@ function idSearch() {
                         console.log(`\nSorry, there is ${res[0].stock_quantity} left!\n`)
                     }
                     else {
-                        console.log(`\x1b[32m%s\x1b[0m`, `\nSufficient quantity!`)
+                        console.log(`\x1b[32m%s\x1b[0m`, `\nSuccess!`)
                         console.log(`\nYou chose ${answer.units} ${res[0].product_name}. Your total is: $ ${answer.units * res[0].price}\n`);
                         var quantityLeft = res[0].stock_quantity - answer.units;
-                        console.log(quantityLeft);
+                        // console.log(quantityLeft);
                         var productSale = answer.units * res[0].price;
-                        console.log(productSale);
+                        // console.log(productSale);
                        
-                        connection.query(`UPDATE products SET stock_quantity=${quantityLeft}, product_sale= product_sale + ${productSale} WHERE item_id=${answer.id}`, function(err, results) {
+                        connection.query(`UPDATE products SET stock_quantity=${quantityLeft}, product_sale= product_sale + ${productSale} WHERE item_id=${answer.id}`, function(err, res) {
                             if (err) throw err;
              
                     });

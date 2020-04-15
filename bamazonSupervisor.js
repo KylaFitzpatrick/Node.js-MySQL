@@ -1,19 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 require("console.table")
-var connection = mysql.createConnection({
-    host: "localhost",
-
-    // Your port; if not 3306
-    port: 3306,
-
-    // Your username
-    user: "root",
-
-    // Your password
-    password: "",
-    database: "bamazon"
-});
+var config = require('./config');
+var connection = mysql.createConnection(config.databaseOptions);
 
 connection.connect(function (err) {
     if (err) throw err;
@@ -66,7 +55,7 @@ function newDepartment(){
         }
     ])
     .then(function(answer) {
-        console.log(`department_name: ${answer.department}, over_head_costs: ${answer.over_head_costs}`)
+        // console.log(`department_name: ${answer.department}, over_head_costs: ${answer.over_head_costs}`)
             
             var statement = 
             "INSERT INTO ?? (??,??) VALUES (?,?) ";
@@ -76,12 +65,12 @@ function newDepartment(){
                       return console.error(err.message);
                     }
                     // get inserted rows
-                    console.log('Row inserted:' + results.affectedRows);
+                    // console.log('Row inserted:' + results.affectedRows);
                   });
 
 
-                  console.log(sqlstmt.sql)
-                  connection.end();
+                //   console.log(sqlstmt.sql)
+                //   connection.end();
                 runSearch();
                 
             }

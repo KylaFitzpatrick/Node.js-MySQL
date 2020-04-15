@@ -1,19 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 require("console.table")
-var connection = mysql.createConnection({
-    host: "localhost",
-
-    // Your port; if not 3306
-    port: 3306,
-
-    // Your username
-    user: "root",
-
-    // Your password
-    password: "",
-    database: "bamazon"
-});
+var config = require('./config');
+var connection = mysql.createConnection(config.databaseOptions);
 
 connection.connect(function (err) {
     if (err) throw err;
@@ -85,8 +74,8 @@ function addNewProduct(){
         }
     ])
     .then(function(answer) {
-        console.log(`product: ${answer.product}, department: ${answer.department}, 
-            price: ${answer.price}, stock_quantity: ${answer.units}`)
+        // console.log(`product: ${answer.product}, department: ${answer.department}, 
+        //     price: ${answer.price}, stock_quantity: ${answer.units}`)
             var statement = 
             "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?) ";
                var sqlstmt= connection.query(statement, ["products","product_name", "department_name", "price", "stock_quantity",answer.product, 
@@ -97,12 +86,12 @@ function addNewProduct(){
                       return console.error(err.message);
                     }
                     // get inserted rows
-                    console.log('Row inserted:' + results.affectedRows);
+                    // console.log('Row inserted:' + results.affectedRows);
                   });
 
 
-                  console.log(sqlstmt.sql)
-                  connection.end();
+                //   console.log(sqlstmt.sql)
+                //   connection.end();
                 runSearch();
                 
             }
@@ -129,27 +118,14 @@ function addInventory(){
         connection.query("SELECT item_id, product_name, stock_quantity, price FROM products WHERE ?",
             {item_id: answer.id}, function (err, res) {
                 if (err) throw err;
-
-                if (answer.id) {
-                    // console.log(`\x1b[32m%s\x1b[0m`, `\nSufficient quantity!`)
-                    console.log(`\nYou chose ${answer.units} ${res[0].product_name}.\n`);
-                    var quantityAdded = res[0].stock_quantity + answer.units;
-                    console.log(quantityAdded);
-                    connection.query(
-                        "UPDATE products SET ? WHERE ?",
-                        [
-                            {
-                                stock_quantity: quantityAdded
-                            },
-                            {
-                                item_id: answer.id
-                            }
-                        ],
-                        function (error) {
-                            if (error) throw err;
+                    console.log(`\nYou chose ${answer.units} unit(s) of ${res[0].product_name}.\n`);
+                    var quantityAdded = answer.units;
+                    // console.log(quantityAdded);
+                    connection.query(`UPDATE products SET stock_quantity= stock_quantity + ${quantityAdded} WHERE item_id=${answer.id}`, function(err, results) {
+                            if (err) throw err;
 
                         });
-                }
+                // }
                 runSearch();
 
             }
@@ -178,43 +154,9 @@ function productsForSale() {
     var query = "SELECT * FROM products";
     connection.query(query, function (err, res) {
         if (err) throw err;
+        console.log("\n")
         console.table(res)
         runSearch();
     })
 }
-
-//             connection.query("SELECT item_id, product_name, stock_quantity, price FROM products WHERE ?",
-//                 {item_id: answer.id}, function (err, res) {
-//                     if (err) throw err;
-
-//                     if (answer.units > res[0].stock_quantity) {
-//                         console.log(`\x1b[31m%s\x1b[0m`, `\nInsufficient quantity!`)
-//                         console.log(`\nSorry, there is ${res[0].stock_quantity} left!\n`)
-//                     }
-//                     else {
-//                         console.log(`\x1b[32m%s\x1b[0m`, `\nSufficient quantity!`)
-//                         console.log(`\nYou chose ${answer.units} ${res[0].product_name}. Your total is: $ ${answer.units * res[0].price}\n`);
-//                         var quantityLeft = res[0].stock_quantity - answer.units;
-//                         console.log(quantityLeft);
-//                         connection.query(
-//                             "UPDATE products SET ? WHERE ?",
-//                             [
-//                                 {
-//                                     stock_quantity: quantityLeft
-//                                 },
-//                                 {
-//                                     item_id: answer.id
-//                                 }
-//                             ],
-//                             function (error) {
-//                                 if (error) throw err;
-
-//                             });
-//                     }
-//                     runSearch();
-
-//                 }
-//             );
-//         });
-// }
 
