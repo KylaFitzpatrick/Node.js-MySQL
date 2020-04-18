@@ -10,17 +10,6 @@ connection.connect(function (err) {
     productsForSale();
 
 });
-function productsForSale() {
-    var query = "SELECT * FROM products";
-    // product_name, department_name, price, stock_quantity
-    connection.query(query, function (err, res) {
-        if (err) throw err;
-        console.log("\n")
-        console.table(res)
-        runSearch();
-    })
-}
-
 function runSearch() {
     inquirer
         .prompt({
@@ -35,11 +24,8 @@ function runSearch() {
         .then(function (answer) {
             switch (answer.action) {
                 case "Find products by id":
-                    idSearch();
-                    break;
-
-                case "Find units of product":
-                    unitsSearch();
+                    productsForSale()
+                    // idSearch();
                     break;
 
                 case "exit":
@@ -48,7 +34,17 @@ function runSearch() {
             }
         });
 }
-
+//products table
+function productsForSale() {
+    var query = "SELECT * FROM products";
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        console.log("\n")
+        console.table(res)
+        idSearch();
+    })
+}
+//search product by id and enter the amount of units
 function idSearch() {
     inquirer
         .prompt([
@@ -67,25 +63,26 @@ function idSearch() {
             connection.query("SELECT item_id, product_name, stock_quantity, price FROM products WHERE ?",
                 {item_id: answer.id}, function (err, res) {
                     if (err) throw err;
+                    //if units is greater than stock insufficient
                     if (answer.units > res[0].stock_quantity) {
                         console.log(`\x1b[31m%s\x1b[0m`, `\nInsufficient quantity!`)
-                        console.log(`\nSorry, there is ${res[0].stock_quantity} left!\n`)
+                        console.log(`\nSorry, there is only ${res[0].stock_quantity} ${res[0].product_name} left!\n`)
                     }
+                    //if units is equal or less than stock success
                     else {
                         console.log(`\x1b[32m%s\x1b[0m`, `\nSuccess!`)
-                        console.log(`\nYou chose ${answer.units} ${res[0].product_name}. Your total is: $ ${answer.units * res[0].price}\n`);
+                        console.log(`\nYour total is: $${answer.units * res[0].price}\n`);
                         var quantityLeft = res[0].stock_quantity - answer.units;
                         // console.log(quantityLeft);
                         var productSale = answer.units * res[0].price;
                         // console.log(productSale);
-                       
+                       //set the reminaing quantity in database
                         connection.query(`UPDATE products SET stock_quantity=${quantityLeft}, product_sale= product_sale + ${productSale} WHERE item_id=${answer.id}`, function(err, res) {
                             if (err) throw err;
              
                     });
                 }
                     runSearch();
-
                 }
             );
         });

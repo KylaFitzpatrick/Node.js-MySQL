@@ -9,7 +9,7 @@ connection.connect(function (err) {
     productsForSale();
 
 });
-
+//prompt for selection
 function runSearch() {
     inquirer
       .prompt({
