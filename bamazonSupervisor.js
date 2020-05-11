@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 require("console.table")
+require('dotenv').config()
 var config = require('./config');
 var connection = mysql.createConnection(config.databaseOptions);
 
@@ -85,7 +86,7 @@ function newDepartment(){
 // between over_head_costs and product_sales. total_profit should not be stored in any database. You should use a custom alias.
 function productSalesByDepartment() {
     var query = 
-    "SELECT department_id, departments.department_name, over_head_costs, SUM(products.product_sale) product_sales, SUM(over_head_costs - products.product_sale) total_profit FROM departments left join products on departments.department_name=products.department_name GROUP BY departments.department_id, departments.department_name, over_head_costs";
+    "SELECT department_id, departments.department_name, over_head_costs, SUM(products.product_sale) product_sales, SUM(products.product_sale - over_head_costs) total_profit FROM departments left join products on departments.department_name=products.department_name GROUP BY departments.department_id, departments.department_name, over_head_costs";
     connection.query(query, function (err, res) {
         if (err) throw err;
         console.log("\n")
